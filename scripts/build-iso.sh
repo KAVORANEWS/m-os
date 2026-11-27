@@ -133,6 +133,7 @@ cat > "$DIST/BUILD-REPORT.md" <<EOF
 | Packages in image | ${PKG_COUNT} |
 | Build host | $(. /etc/os-release; echo "$PRETTY_NAME"), $(nproc) CPUs |
 | Build time | $(( (END-START)/60 )) min $(( (END-START)%60 )) s |
+| Build mode | $( [ "${MOS_RESUME:-0}" = 1 ] && echo "resumed (developer mode: chroot and squashfs reused from an earlier run, verified $(cat "$LBDIR/.mos-verified" 2>/dev/null))" || echo "clean build" ) |
 
 ## ISO verification
 
