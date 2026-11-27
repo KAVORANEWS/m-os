@@ -70,7 +70,7 @@ jobs:
               DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
                 live-build debootstrap xorriso squashfs-tools mtools dosfstools grub-pc-bin grub-efi-amd64-bin \
                 dpkg-dev debhelper dh-python lintian fakeroot rsync git ca-certificates shellcheck python3 \
-                desktop-file-utils cpio
+                desktop-file-utils cpio apt-utils
               git config --global --add safe.directory /src
               ./scripts/build-iso.sh
             '

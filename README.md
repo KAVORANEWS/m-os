@@ -84,7 +84,7 @@ Live session user: `mos`, password `live`. For USB creation and installation, se
 You need a Debian 13 host (or `debian:trixie` container), about 25 GB free disk, and root:
 
 ```bash
-sudo apt install live-build debootstrap xorriso squashfs-tools mtools dosfstools \
+sudo apt install live-build debootstrap xorriso squashfs-tools mtools dosfstools apt-utils \
   grub-pc-bin grub-efi-amd64-bin dpkg-dev debhelper dh-python lintian rsync shellcheck \
   python3-pyqt6 desktop-file-utils
 sudo ./scripts/build-iso.sh          # → dist/M-OS-<version>-amd64.iso, SHA256SUMS, BUILD-REPORT.md

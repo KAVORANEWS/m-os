@@ -7,7 +7,7 @@
 * Packages:
 
 ```bash
-sudo apt install live-build debootstrap xorriso squashfs-tools mtools dosfstools \
+sudo apt install live-build debootstrap xorriso squashfs-tools mtools dosfstools apt-utils \
   grub-pc-bin grub-efi-amd64-bin dpkg-dev debhelper dh-python lintian fakeroot rsync \
   shellcheck python3-pyqt6 python3-pyflakes desktop-file-utils librsvg2-bin imagemagick \
   fonts-inter qemu-system-x86 qemu-utils ovmf

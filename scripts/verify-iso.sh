@@ -35,7 +35,7 @@ grep -qi "UEFI" "$TMP/eltorito" && pass "El Torito UEFI boot entry" || bad "no E
 
 xorriso -osirrox on -indev "$ISO" -extract /boot/grub/grub.cfg "$TMP/grub.cfg" >/dev/null 2>&1
 grep -q "Try or Install M OS" "$TMP/grub.cfg" && pass "GRUB menu is M OS branded" || bad "GRUB menu not branded"
-grep -q "@KERNEL_LIVE@\|@APPEND_LIVE@" "$TMP/grub.cfg" && bad "unsubstituted placeholders in grub.cfg" || pass "GRUB placeholders substituted"
+grep -qE "@[A-Z_]+@" "$TMP/grub.cfg" && bad "unsubstituted placeholders in grub.cfg" || pass "GRUB placeholders substituted"
 
 if command -v unsquashfs >/dev/null; then
     xorriso -osirrox on -indev "$ISO" -extract /live/filesystem.squashfs "$TMP/fs.squashfs" >/dev/null 2>&1

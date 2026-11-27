@@ -28,11 +28,11 @@ export PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH"
 
 log "1/9 Checking build dependencies"
 missing=()
-for cmd in lb debootstrap xorriso mksquashfs unsquashfs dpkg-buildpackage dh python3 sha256sum rsync; do
+for cmd in lb debootstrap xorriso mksquashfs unsquashfs dpkg-buildpackage dh python3 sha256sum rsync apt-ftparchive mkfs.vfat mcopy; do
     command -v "$cmd" >/dev/null || missing+=("$cmd")
 done
 [ "${#missing[@]}" -eq 0 ] || die "missing tools: ${missing[*]}
-Install: apt install live-build debootstrap xorriso squashfs-tools dpkg-dev debhelper dh-python rsync"
+Install: apt install live-build debootstrap xorriso squashfs-tools dpkg-dev debhelper dh-python rsync apt-utils dosfstools mtools"
 grep -q 'trixie\|^13' /etc/debian_version 2>/dev/null || echo "warning: building on a non-Debian-13 host is untested"
 avail_gb=$(df --output=avail -BG "$ROOT" | tail -1 | tr -dc '0-9')
 [ "$avail_gb" -ge 15 ] || die "at least 15 GB free disk space is required (have ${avail_gb} GB)"
