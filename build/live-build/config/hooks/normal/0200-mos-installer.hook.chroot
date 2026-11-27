@@ -16,13 +16,13 @@ sed -i 's/^\(\s*\)- minlen=0/\1- minlen=8/' "$CFG/modules/users.conf"
 sed -i 's/requiredStorage:.*/requiredStorage:    20/' "$CFG/modules/welcome.conf"
 
 # Launcher identity
-for f in /usr/share/applications/calamares-install-debian.desktop; do
-    [ -f "$f" ] || continue
+f=/usr/share/applications/calamares-install-debian.desktop
+if [ -f "$f" ]; then
     sed -i -e 's/^Name=.*/Name=Install M OS/' -e '/^Name\[/d' \
            -e 's/^GenericName=.*/GenericName=Install M OS to this computer/' -e '/^GenericName\[/d' \
            -e 's/^Comment=.*/Comment=Install M OS to this computer/' -e '/^Comment\[/d' \
            -e 's/^Icon=.*/Icon=mos-logo/' "$f"
-done
+fi
 
 # After installation the live-only welcome shortcut and installer are removed
 # by Calamares' packages module (calamares-settings-debian behaviour).

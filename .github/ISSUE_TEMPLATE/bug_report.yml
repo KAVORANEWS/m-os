@@ -1,0 +1,24 @@
+name: Bug report
+description: Something in M OS does not work
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes: {label: M OS version and build, description: "From M OS About (e.g. 0.1.0, build 12.20261127)"}
+    validations: {required: true}
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options: [Live session, Installed system, Installer, Boot / GRUB, Build system]
+    validations: {required: true}
+  - type: input
+    id: hardware
+    attributes: {label: Hardware, description: "CPU, GPU, RAM, or VM (QEMU/VirtualBox) and firmware (UEFI/BIOS)"}
+  - type: textarea
+    id: steps
+    attributes: {label: Steps to reproduce and what happened}
+    validations: {required: true}
+  - type: textarea
+    id: logs
+    attributes: {label: Logs, description: "journalctl -b -p warning, ~/.local/share/sddm/wayland-session.log, /var/log/installer or Calamares log", render: text}

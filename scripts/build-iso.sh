@@ -24,6 +24,8 @@ die() { printf '\033[1;31mERROR: %s\033[0m\n' "$*" >&2; exit 1; }
 
 [ "$(id -u)" -eq 0 ] || die "live-build needs root. Run: sudo $0"
 
+export PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+
 log "1/9 Checking build dependencies"
 missing=()
 for cmd in lb debootstrap xorriso mksquashfs unsquashfs dpkg-buildpackage dh python3 sha256sum rsync; do

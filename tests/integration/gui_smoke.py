@@ -20,7 +20,6 @@ os.environ.setdefault("XDG_CONFIG_HOME", tempfile.mkdtemp(prefix="mos-gui-"))
 
 from PyQt6.QtCore import QTimer  # noqa: E402
 from PyQt6.QtGui import QIcon  # noqa: E402
-from PyQt6.QtWidgets import QApplication  # noqa: E402
 
 
 def main() -> int:

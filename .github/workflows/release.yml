@@ -1,0 +1,15 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: ./.github/workflows/build-iso.yml
+    with:
+      boot_test: true
+      publish: true

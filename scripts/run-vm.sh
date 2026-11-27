@@ -29,6 +29,7 @@ done
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VMDIR="$ROOT/build/vm"
 mkdir -p "$VMDIR"
+# shellcheck disable=SC2054  # commas are part of QEMU option values
 args=(-name "M OS test VM" -m "$MEM" -smp "$CPUS" -device virtio-vga -display "${MOS_VM_DISPLAY:-gtk}"
       -device qemu-xhci -device usb-tablet -nic user,model=virtio-net-pci
       -audiodev none,id=snd0 -device intel-hda -device hda-duplex,audiodev=snd0)
