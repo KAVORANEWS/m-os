@@ -1,0 +1,20 @@
+# Build outputs
+/build/work/
+/build/vm/
+/build/screenshots/
+/build/live-build/config/packages.chroot/*.deb
+/build/live-build/config/includes.chroot/usr/share/mos/build-info
+/build/live-build/.build/
+/build/live-build/chroot*
+/build/live-build/binary*
+/build/live-build/cache/
+/build/live-build/*.iso
+/build/live-build/build.log
+/dist/
+/packages/*/files/usr/share/color-schemes/
+__pycache__/
+*.pyc
+# Never commit credentials
+.env
+*.token
+.secrets/
