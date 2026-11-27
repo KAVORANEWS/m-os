@@ -14,6 +14,7 @@ terminal-font: "Unifont Regular 16"
         selected_item_color = "#FFFFFF"
         item_font = "Unifont Regular 16"
         selected_item_font = "Unifont Regular 16"
+        selected_item_pixmap_style = "select_*.png"
         item_height = 24
         item_padding = 6
         item_spacing = 6
