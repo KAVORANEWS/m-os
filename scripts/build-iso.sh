@@ -36,7 +36,8 @@ done
 Install: apt install live-build debootstrap xorriso squashfs-tools dpkg-dev debhelper dh-python rsync apt-utils dosfstools mtools"
 grep -q 'trixie\|^13' /etc/debian_version 2>/dev/null || echo "warning: building on a non-Debian-13 host is untested"
 avail_gb=$(df --output=avail -BG "$ROOT" | tail -1 | tr -dc '0-9')
-[ "$avail_gb" -ge 15 ] || die "at least 15 GB free disk space is required (have ${avail_gb} GB)"
+need_gb=15; [ "${MOS_RESUME:-0}" = 1 ] && need_gb=6
+[ "$avail_gb" -ge "$need_gb" ] || die "at least ${need_gb} GB free disk space is required (have ${avail_gb} GB)"
 
 log "2/9 Validating configuration"
 "$ROOT/scripts/validate-build.sh"
