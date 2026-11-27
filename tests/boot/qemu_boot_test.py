@@ -138,7 +138,10 @@ def main() -> int:
     ap.add_argument("--cpus", default="2")
     ap.add_argument("--grub-wait", type=float, default=None, help="seconds before editing the GRUB entry")
     ap.add_argument("--boot-timeout", type=float, default=None)
+    ap.add_argument("--no-desktop", action="store_true",
+                    help="boot to multi-user.target and skip graphical checks (low-RAM / no-KVM hosts)")
     args = ap.parse_args()
+    sys.stdout.reconfigure(line_buffering=True)
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -198,7 +201,8 @@ def main() -> int:
         time.sleep(0.5)
         qmp.key("end")
         time.sleep(0.5)
-        qmp.type_text(" console=tty0 console=ttyS0,115200")
+        extra = " systemd.unit=multi-user.target" if args.no_desktop else ""
+        qmp.type_text(" console=tty0 console=ttyS0,115200" + extra)
         time.sleep(3)  # let GRUB process the queued keystrokes
         qmp.screenshot(out / "02-grub-edit.png")
         qmp.key("ctrl", "x")
@@ -233,30 +237,35 @@ def main() -> int:
         rc, txt = serial.run("uname -r")
         report["measurements"]["kernel"] = txt
         rc, txt = serial.run("systemctl is-active sddm", 30)
-        check("SDDM display manager active", txt.strip() == "active", txt)
+        if args.no_desktop:
+            report["mode"] = "no-desktop (multi-user.target): graphical checks skipped"
+            print("SKIP  graphical session checks (--no-desktop)")
+        else:
+            check("SDDM display manager active", txt.strip() == "active", txt)
 
-        # Wait for the Plasma desktop of the auto-logged-in live user
-        desktop = False
-        t_desk = time.time()
-        while time.time() - t_desk < (240 if kvm else 1800):
-            rc, txt = serial.run("pgrep -u mos -x plasmashell >/dev/null && pgrep -u mos -x kwin_wayland -o >/dev/null "
-                                 "&& echo DESKTOP-UP || (pgrep -u mos -x plasmashell >/dev/null && pgrep -u mos kwin_x11 >/dev/null && echo DESKTOP-UP)", 30)
-            if "DESKTOP-UP" in txt:
-                desktop = True
-                break
-            time.sleep(5)
-        report["measurements"]["boot_to_desktop_s"] = round(time.time() - t0, 1)
-        check("Plasma desktop running (plasmashell + KWin)", desktop,
-              f"{report['measurements']['boot_to_desktop_s']} s after power-on")
-        rc, txt = serial.run("loginctl list-sessions --no-legend; loginctl show-user mos -p Display --value", 15)
-        rc2, sess = serial.run("for s in $(loginctl list-sessions --no-legend | awk '{print $1}'); do "
-                               "loginctl show-session $s -p Type -p Desktop -p Name; done", 15)
-        report["measurements"]["sessions"] = sess
-        time.sleep(25)  # let autostart apps (M OS Welcome) appear
-        qmp.screenshot(out / "03-desktop.png")
+        if not args.no_desktop:
+            # Wait for the Plasma desktop of the auto-logged-in live user
+            desktop = False
+            t_desk = time.time()
+            while time.time() - t_desk < (240 if kvm else 1800):
+                rc, txt = serial.run("pgrep -u mos -x plasmashell >/dev/null && pgrep -u mos -x kwin_wayland -o >/dev/null "
+                                     "&& echo DESKTOP-UP || (pgrep -u mos -x plasmashell >/dev/null && pgrep -u mos kwin_x11 >/dev/null && echo DESKTOP-UP)", 30)
+                if "DESKTOP-UP" in txt:
+                    desktop = True
+                    break
+                time.sleep(5)
+            report["measurements"]["boot_to_desktop_s"] = round(time.time() - t0, 1)
+            check("Plasma desktop running (plasmashell + KWin)", desktop,
+                  f"{report['measurements']['boot_to_desktop_s']} s after power-on")
+            rc, txt = serial.run("loginctl list-sessions --no-legend; loginctl show-user mos -p Display --value", 15)
+            rc2, sess = serial.run("for s in $(loginctl list-sessions --no-legend | awk '{print $1}'); do "
+                                   "loginctl show-session $s -p Type -p Desktop -p Name; done", 15)
+            report["measurements"]["sessions"] = sess
+            time.sleep(25)  # let autostart apps (M OS Welcome) appear
+            qmp.screenshot(out / "03-desktop.png")
 
-        rc, txt = serial.run("pgrep -u mos -af mos-welcome | head -1", 15)
-        check("M OS Welcome autostarted", "mos-welcome" in txt, txt, required=False)
+            rc, txt = serial.run("pgrep -u mos -af mos-welcome | head -1", 15)
+            check("M OS Welcome autostarted", "mos-welcome" in txt, txt, required=False)
         rc, txt = serial.run("ls /usr/bin/mos-welcome /usr/bin/mos-control-center /usr/bin/mos-update-center "
                              "/usr/bin/mos-system-monitor /usr/bin/mos-about", 15)
         check("M OS applications installed", rc == 0, txt)
@@ -295,7 +304,7 @@ def main() -> int:
         rc, txt = serial.run("calamares --version 2>/dev/null | tail -1; ls /etc/calamares/branding/mos/", 30)
         check("Calamares installer with M OS branding present", "branding.desc" in txt, txt)
 
-        qmp.screenshot(out / "04-desktop-final.png")
+        qmp.screenshot(out / ("04-console-final.png" if args.no_desktop else "04-desktop-final.png"))
         serial.run("sudo -n systemctl poweroff", 5)
         try:
             proc.wait(timeout=120)
@@ -304,6 +313,10 @@ def main() -> int:
             check("clean shutdown", False, "VM did not power off within 120 s", required=False)
     except SystemExit:
         pass
+    except (BrokenPipeError, ConnectionError, OSError) as e:
+        qemu_rc = proc.poll()
+        check("VM kept running during the test", False,
+              f"QEMU terminated (exit {qemu_rc}): {e}. On small hosts this is usually the host OOM killer.")
     finally:
         if proc.poll() is None:
             proc.kill()
@@ -311,7 +324,8 @@ def main() -> int:
         report["duration_s"] = round(time.time() - t0, 1)
         (out / "report.json").write_text(json.dumps(report, indent=2))
         lines = [f"# Boot test — {report['iso']} ({args.firmware.upper()})", "",
-                 f"KVM: {kvm} · RAM {args.mem} MB · {args.cpus} vCPU · result: **{'PASS' if ok else 'FAIL'}**", "",
+                 f"KVM: {kvm} · RAM {args.mem} MB · {args.cpus} vCPU · mode: {report.get('mode', 'full desktop')} · "
+                 f"result: **{'PASS' if ok else 'FAIL'}**", "",
                  "| Check | Result | Detail |", "|---|---|---|"]
         for name, c in report["checks"].items():
             res = "PASS" if c["passed"] else ("FAIL" if c["required"] else "WARN")
