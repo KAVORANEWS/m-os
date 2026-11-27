@@ -1,0 +1,15 @@
+[Unit]
+Description=M OS first-boot firewall setup (deny incoming, allow outgoing)
+Documentation=https://github.com/dotsoftwarelk/m-os/blob/main/docs/security.md
+After=local-fs.target
+Before=network-pre.target ufw.service
+Wants=network-pre.target
+ConditionPathExists=!/var/lib/mos/firewall-initialized
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/mos/mos-firewall-setup
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

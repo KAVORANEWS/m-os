@@ -1,0 +1,11 @@
+#!/bin/sh
+# Configure and enable the UFW firewall once, with safe defaults.
+# Runs as a systemd oneshot (mos-firewall-setup.service).
+set -e
+command -v ufw >/dev/null 2>&1 || exit 0
+ufw --force default deny incoming
+ufw --force default allow outgoing
+ufw --force default deny routed
+ufw --force enable
+mkdir -p /var/lib/mos
+date -u +%Y-%m-%dT%H:%M:%SZ > /var/lib/mos/firewall-initialized

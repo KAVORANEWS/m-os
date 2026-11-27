@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=M OS Update Center
+GenericName=Software Updates
+Comment=Check for and install system updates
+Exec=mos-update-center
+Icon=mos-update-center
+Terminal=false
+Categories=Qt;KDE;System;PackageManager;
+Keywords=update;upgrade;security;apt;
+StartupNotify=true

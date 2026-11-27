@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_install:
+	mkdir -p debian/mos-branding
+	cp -a files/. debian/mos-branding/
+
+# Wallpapers and logos are already optimised by scripts/render-branding.sh
+override_dh_compress:
+	dh_compress -X.jpg -X.png -X.svg

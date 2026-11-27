@@ -1,0 +1,3 @@
+# File indexing: on by default in Balanced profile; the Performance profile turns it off.
+[General]
+only basic indexing=true

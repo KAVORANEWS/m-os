@@ -1,0 +1,37 @@
+---
+# M OS installer branding for Calamares
+componentName:  mos
+
+welcomeStyleCalamares:   true
+welcomeExpandingLogo:   true
+windowExpanding:    normal
+windowSize: 960px,640px
+windowPlacement: center
+
+strings:
+    productName:         "M OS"
+    shortProductName:    "M OS"
+    version:             "0.1 Preview"
+    shortVersion:        "0.1"
+    versionedName:       "M OS 0.1 Preview"
+    shortVersionedName:  "M OS 0.1"
+    bootloaderEntryName: "M OS"
+    productUrl:          "https://github.com/dotsoftwarelk/m-os"
+    supportUrl:          "https://github.com/dotsoftwarelk/m-os/issues"
+    knownIssuesUrl:      "https://github.com/dotsoftwarelk/m-os/blob/main/docs/known-issues.md"
+    releaseNotesUrl:     "https://github.com/dotsoftwarelk/m-os/blob/main/CHANGELOG.md"
+    donateUrl:           "https://github.com/dotsoftwarelk/m-os"
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "logo.png"
+    productWelcome:      "welcome.png"
+
+slideshow:               "show.qml"
+slideshowAPI: 2
+
+style:
+   SidebarBackground:        "#0B1020"
+   SidebarText:              "#E0E7FF"
+   SidebarTextCurrent:       "#FFFFFF"
+   SidebarBackgroundCurrent: "#6D5DF6"

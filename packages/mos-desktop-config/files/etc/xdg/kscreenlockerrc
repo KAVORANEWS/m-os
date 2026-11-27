@@ -1,0 +1,9 @@
+# Lock the screen automatically and on resume (security baseline)
+[Daemon]
+Autolock=true
+LockOnResume=true
+Timeout=10
+LockGrace=5
+
+[Greeter][Wallpaper][org.kde.image][General]
+Image=/usr/share/wallpapers/MOS/

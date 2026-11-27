@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=M OS Control Center
+GenericName=System Settings
+Comment=Configure your computer
+Exec=mos-control-center
+Icon=mos-control-center
+Terminal=false
+Categories=Qt;KDE;Settings;
+Keywords=settings;preferences;control;configure;display;network;security;
+StartupNotify=true

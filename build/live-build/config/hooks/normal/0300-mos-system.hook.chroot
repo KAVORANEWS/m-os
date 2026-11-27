@@ -1,0 +1,44 @@
+#!/bin/sh
+# System-level M OS defaults that must be applied inside the image.
+set -e
+
+# Never ship remote access services enabled.
+for svc in ssh.service sshd.service; do
+    systemctl disable "$svc" 2>/dev/null || true
+done
+
+# Firewall first-boot unit and AppArmor
+systemctl enable mos-firewall-setup.service
+systemctl enable apparmor.service 2>/dev/null || true
+
+# M OS boot splash
+if command -v plymouth-set-default-theme >/dev/null; then
+    plymouth-set-default-theme mos
+    update-initramfs -u -k all
+fi
+
+# Make sure desktop-base (Debian branding) is not present.
+if dpkg -s desktop-base >/dev/null 2>&1; then
+    apt-get purge -y desktop-base
+fi
+
+# KDE's own first-run app (plasma-welcome, only Recommended by plasma-desktop)
+# duplicates M OS Welcome and opened on top of it in the live session.
+if dpkg -s plasma-welcome >/dev/null 2>&1; then
+    apt-get purge -y plasma-welcome
+fi
+
+# Icon caches for M OS icons
+gtk-update-icon-cache -q -f -t /usr/share/icons/hicolor 2>/dev/null || true
+
+# Default XDG user folders for new accounts
+mkdir -p /etc/skel/Desktop /etc/skel/Documents /etc/skel/Downloads /etc/skel/Pictures \
+         /etc/skel/Music /etc/skel/Videos
+
+# live-build's bootstrap stage copies Debian's os-release into /etc/os-release
+# as a regular file (before mos-branding is installed). Restore the standard
+# Debian layout: /etc/os-release -> ../usr/lib/os-release (owned by M OS).
+if [ ! -L /etc/os-release ] || [ "$(readlink /etc/os-release)" != ../usr/lib/os-release ]; then
+    rm -f /etc/os-release
+    ln -s ../usr/lib/os-release /etc/os-release
+fi

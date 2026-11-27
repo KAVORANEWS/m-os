@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: mos-apps
+Source: https://github.com/dotsoftwarelk/m-os
+
+Files: *
+Copyright: 2026 M OS Project
+License: GPL-3.0-or-later
+ On Debian systems see /usr/share/common-licenses/GPL-3.
+

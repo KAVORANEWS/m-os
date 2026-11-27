@@ -1,0 +1,20 @@
+Source: mos-branding
+Section: misc
+Priority: optional
+Maintainer: M OS Project <dotsoftwarelk@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Homepage: https://github.com/dotsoftwarelk/m-os
+Vcs-Browser: https://github.com/dotsoftwarelk/m-os
+Rules-Requires-Root: no
+
+Package: mos-branding
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: plymouth, plymouth-label, papirus-icon-theme, fonts-inter
+Description: M OS branding: logos, wallpapers, themes and identity
+ Original M OS artwork and desktop identity: the M OS logo, Aurora
+ wallpapers (light and dark), the M OS Modern and M OS Classic Plasma
+ global themes, M OS Dark/Light color schemes, the Plasma splash screen,
+ boot splash (Plymouth), login screen background, installer (Calamares)
+ branding and the M OS os-release identity.

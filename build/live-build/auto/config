@@ -1,0 +1,43 @@
+#!/bin/sh
+# M OS live-build configuration (Debian 13 "trixie", amd64).
+# Invoked by `lb config`; see scripts/build-iso.sh for the full pipeline.
+set -e
+
+MOS_VERSION="$(cat ../../VERSION 2>/dev/null || echo 0.1.0)"
+MOS_MIRROR="${MOS_MIRROR:-http://deb.debian.org/debian/}"
+MOS_SECURITY_MIRROR="${MOS_SECURITY_MIRROR:-http://security.debian.org/debian-security/}"
+
+lb config noauto \
+    --mode debian \
+    --distribution trixie \
+    --architecture amd64 \
+    --archive-areas "main contrib non-free-firmware" \
+    --parent-archive-areas "main contrib non-free-firmware" \
+    --mirror-bootstrap "${MOS_MIRROR}" \
+    --mirror-chroot "${MOS_MIRROR}" \
+    --mirror-binary "http://deb.debian.org/debian/" \
+    --mirror-chroot-security "${MOS_SECURITY_MIRROR}" \
+    --mirror-binary-security "http://security.debian.org/debian-security/" \
+    --security true \
+    --updates true \
+    --apt-recommends true \
+    --apt-indices true \
+    --linux-flavours amd64 \
+    --firmware-chroot true \
+    --firmware-binary true \
+    --binary-images iso-hybrid \
+    --bootloaders "grub-efi grub-pc" \
+    --uefi-secure-boot enable \
+    --chroot-squashfs-compression-type xz \
+    --debian-installer none \
+    --memtest none \
+    --win32-loader false \
+    --iso-application "M OS" \
+    --iso-publisher "M OS Project; https://github.com/dotsoftwarelk/m-os" \
+    --iso-preparer "M OS live-build pipeline" \
+    --iso-volume "M_OS_${MOS_VERSION}" \
+    --image-name "M-OS-${MOS_VERSION}" \
+    --bootappend-live "boot=live components quiet splash username=mos hostname=m-os locales=en_US.UTF-8 keyboard-layouts=us timezone=Asia/Colombo" \
+    --cache-packages true \
+    --cache-indices false \
+    "${@}"

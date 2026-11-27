@@ -1,0 +1,8 @@
+{
+    "KPlugin": {
+        "Authors": [ { "Name": "M OS Project" } ],
+        "Id": "MOS",
+        "License": "CC-BY-SA-4.0",
+        "Name": "M OS Aurora"
+    }
+}

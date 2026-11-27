@@ -1,0 +1,6 @@
+# Tags accepted for M OS distribution packages (documented in docs/developer-guide.md)
+# os-release diversion is intentional: mos-branding provides the distribution identity.
+diversion-for-unknown-file
+# Native packages without upstream tarballs.
+no-manual-page
+initial-upload-closes-no-bugs

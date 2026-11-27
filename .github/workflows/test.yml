@@ -1,0 +1,48 @@
+name: Test
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate, unit tests, packages, GUI smoke test
+    runs-on: ubuntu-24.04
+    container: debian:trixie
+    steps:
+      - name: Install tools
+        run: |
+          sed -i 's/^Components: main$/Components: main contrib non-free-firmware/' /etc/apt/sources.list.d/debian.sources
+          apt-get update -q
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
+            git ca-certificates shellcheck python3 python3-pyqt6 python3-pyflakes desktop-file-utils \
+            dpkg-dev debhelper dh-python lintian fakeroot imagemagick librsvg2-bin fonts-inter fonts-noto-core \
+            libgl1 libegl1 libxkbcommon0 libfontconfig1 libdbus-1-3
+      - uses: actions/checkout@v4
+      - name: Static validation (configuration, shell, package availability)
+        run: ./scripts/validate-build.sh
+      - name: Pyflakes
+        run: python3 -m pyflakes applications/python/mos tests
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests/unit -v
+      - name: Build Debian packages
+        run: ./scripts/build-packages.sh
+      - name: Package tests
+        run: tests/packaging/test-packages.sh dist/packages
+      - name: GUI smoke test (Qt offscreen)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python3 tests/integration/gui_smoke.py build/screenshots
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: packages-and-app-screenshots
+          path: |
+            dist/packages/*.deb
+            build/screenshots/*.png
+          retention-days: 14

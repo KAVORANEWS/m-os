@@ -1,0 +1,8 @@
+# M OS — security baseline
+ufw
+apparmor
+apparmor-utils
+apparmor-profiles
+apparmor-profiles-extra
+unattended-upgrades
+debsums

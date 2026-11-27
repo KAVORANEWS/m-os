@@ -1,0 +1,126 @@
+{
+  "iso": "M-OS-0.1.0-amd64.iso",
+  "firmware": "uefi",
+  "kvm": true,
+  "mem_mb": 4096,
+  "cpus": 2,
+  "checks": {
+    "boots to login prompt": {
+      "passed": true,
+      "detail": "43.6 s",
+      "required": true
+    },
+    "live user login over serial console": {
+      "passed": true,
+      "detail": "",
+      "required": true
+    },
+    "os-release identifies M OS": {
+      "passed": true,
+      "detail": "PRETTY_NAME=\"M OS 0.1 Preview\"\nNAME=\"M OS\"\nID=mos",
+      "required": true
+    },
+    "booted via UEFI firmware": {
+      "passed": true,
+      "detail": "uefi",
+      "required": true
+    },
+    "SDDM display manager active": {
+      "passed": true,
+      "detail": "active",
+      "required": true
+    },
+    "Plasma desktop running (plasmashell + KWin)": {
+      "passed": true,
+      "detail": "54.0 s after power-on",
+      "required": true
+    },
+    "M OS Welcome autostarted": {
+      "passed": true,
+      "detail": "2097 /usr/bin/python3 /usr/bin/mos-welcome --autostart",
+      "required": false
+    },
+    "M OS applications installed": {
+      "passed": true,
+      "detail": "/usr/bin/mos-about  /usr/bin/mos-control-center  /usr/bin/mos-system-monitor  /usr/bin/mos-update-center  /usr/bin/mos-welcome",
+      "required": true
+    },
+    "M OS Python library runs on target": {
+      "passed": true,
+      "detail": "AMD EPYC 7763 64-Core Processor 3.8 GiB",
+      "required": true
+    },
+    "mos-desktopctl available": {
+      "passed": true,
+      "detail": "plasma-apply-lookandfeel --apply org.mos.classic.desktop --resetLayout\nkwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key ButtonsOnLeft \nkwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key ButtonsOnRight IAX",
+      "required": true
+    },
+    "firewall active (ufw)": {
+      "passed": true,
+      "detail": "Status: active",
+      "required": true
+    },
+    "AppArmor enabled": {
+      "passed": true,
+      "detail": "AA-ON\napparmor module is loaded.",
+      "required": true
+    },
+    "no network services listening on external interfaces": {
+      "passed": true,
+      "detail": "none",
+      "required": true
+    },
+    "SSH not enabled": {
+      "passed": true,
+      "detail": "not-found\nnot-installed",
+      "required": true
+    },
+    "zram swap active": {
+      "passed": false,
+      "detail": "Command 'swapon' is available in the following places\n * /sbin/swapon\n * /usr/sbin/swapon\nThe command could not be located because '/sbin:/usr/sbin' is not included in the PATH environment variable.\nThis is most likely caused by the lack of administrative privileges associated with your user account.\nswapon: command not found",
+      "required": false
+    },
+    "Sinhala fonts available": {
+      "passed": true,
+      "detail": "Noto Serif Sinhala,Noto Serif Sinhala SemiCondensed Black\nNoto Sans Sinhala,Noto Sans Sinhala SemiCondensed ExtraLight\nNoto Serif Sinhala,Noto Serif Sinhala Condensed Medium",
+      "required": true
+    },
+    "English and Sinhala locales generated": {
+      "passed": true,
+      "detail": "en_US.utf8\nsi_LK\nsi_LK.utf8",
+      "required": true
+    },
+    "Sinhala input methods present": {
+      "passed": true,
+      "detail": "1\n/usr/share/m17n/si-phonetic-dynamic.mim\n/usr/share/m17n/si-samanala.mim\n/usr/share/m17n/si-sayura.mim\n/usr/share/m17n/si-singlish.mim\n/usr/share/m17n/si-sumihiri.mim\n/usr/share/m17n/si-trans.mim\n/usr/share/m17n/si-wijesekara.mim",
+      "required": false
+    },
+    "no failed systemd units": {
+      "passed": true,
+      "detail": "none",
+      "required": false
+    },
+    "Calamares installer with M OS branding present": {
+      "passed": true,
+      "detail": "branding.desc  logo.png  show.qml  slide-bg.png  welcome.png",
+      "required": true
+    },
+    "clean shutdown": {
+      "passed": true,
+      "detail": "",
+      "required": false
+    }
+  },
+  "measurements": {
+    "boot_to_login_prompt_s": 43.6,
+    "kernel": "6.12.118+deb13-amd64",
+    "boot_to_desktop_s": 54.0,
+    "sessions": "Name=mos\nDesktop=KDE\nType=wayland\nName=mos\nDesktop=\nType=unspecified\nName=mos\nDesktop=\nType=tty",
+    "ram_used_mb_desktop_idle": "1711",
+    "loadavg": "2.05 0.62 0.21 1/411 2416",
+    "systemd_analyze": "Startup finished in 3.858s (kernel) + 12.057s (userspace) = 15.916s",
+    "top_user_processes_rss_kb": "543468 plasmashell\n338612 plasma-welcome\n277732 kwin_wayland\n247776 DiscoverNotifie\n189596 mos-welcome\n154524 kded6\n152388 xwaylandvideobr\n148532 kdeconnectd"
+  },
+  "passed": true,
+  "duration_s": 83.7
+}

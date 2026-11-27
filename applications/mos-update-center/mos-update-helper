@@ -1,0 +1,43 @@
+#!/bin/sh
+# M OS Update Center privileged helper.
+# Invoked only through pkexec (polkit action org.mos.updatecenter.helper).
+# Accepts a fixed set of verbs; never takes package names or shell input.
+# SPDX-License-Identifier: GPL-3.0-or-later
+set -u
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "mos-update-helper must run as root (via pkexec)" >&2
+    exit 64
+fi
+
+export DEBIAN_FRONTEND=noninteractive
+export LC_ALL=C.UTF-8
+APT_OPTS="-o APT::Status-Fd=1 -o Dpkg::Progress-Fancy=0 -o Dpkg::Use-Pty=0 \
+-o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold"
+
+case "${1:-}" in
+    refresh)
+        # shellcheck disable=SC2086
+        exec apt-get $APT_OPTS update
+        ;;
+    upgrade)
+        # Safe upgrade: installs new dependencies but never removes packages.
+        # shellcheck disable=SC2086
+        apt-get $APT_OPTS -y --with-new-pkgs upgrade
+        rc=$?
+        if [ $rc -eq 0 ] && [ -f /var/run/reboot-required ]; then
+            echo "mos:reboot-required"
+        fi
+        exit $rc
+        ;;
+    repair)
+        # Finish interrupted installations.
+        dpkg --configure -a
+        # shellcheck disable=SC2086
+        exec apt-get $APT_OPTS -y -f install
+        ;;
+    *)
+        echo "usage: mos-update-helper refresh|upgrade|repair" >&2
+        exit 64
+        ;;
+esac

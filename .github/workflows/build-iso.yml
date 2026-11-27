@@ -1,0 +1,179 @@
+name: Build ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      boot_test:
+        description: "Run QEMU/KVM boot tests (BIOS + UEFI)"
+        type: boolean
+        default: true
+      publish:
+        description: "Publish a GitHub pre-release with the ISO"
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      boot_test:
+        type: boolean
+        default: true
+      publish:
+        type: boolean
+        default: true
+  pull_request:
+    paths:
+      - "build/**"
+      - "packages/**"
+      - "applications/**"
+      - "scripts/build-iso.sh"
+      - ".github/workflows/build-iso.yml"
+  push:
+    branches: [main]
+    paths:
+      - "build/**"
+      - "packages/**"
+      - "applications/**"
+      - "branding/**"
+      - "scripts/build-iso.sh"
+      - "VERSION"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-iso-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build M OS ISO (Debian 13, live-build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - name: Free disk space on runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/powershell /usr/share/swift /usr/local/.ghcup || true
+          sudo docker image prune --all --force || true
+          df -h /
+      - uses: actions/checkout@v4
+      - id: meta
+        run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+      - name: Build ISO in a privileged debian:trixie container
+        run: |
+          docker run --rm --privileged -v "$PWD:/src" -w /src \
+            -e MOS_BUILD_ID="${GITHUB_RUN_NUMBER}.$(date -u +%Y%m%d)" \
+            debian:trixie bash -euxc '
+              sed -i "s/^Components: main$/Components: main contrib non-free-firmware/" /etc/apt/sources.list.d/debian.sources
+              apt-get update -q
+              DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
+                live-build debootstrap xorriso squashfs-tools mtools dosfstools grub-pc-bin grub-efi-amd64-bin \
+                dpkg-dev debhelper dh-python lintian fakeroot rsync git ca-certificates shellcheck python3 \
+                desktop-file-utils cpio apt-utils
+              git config --global --add safe.directory /src
+              ./scripts/build-iso.sh
+            '
+          sudo chown -R "$(id -u):$(id -g)" dist build || true
+      - name: Build log (on failure)
+        if: failure()
+        run: tail -n 300 build/work/lb-build.log || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m-os-iso
+          path: |
+            dist/*.iso
+            dist/SHA256SUMS
+            dist/BUILD-REPORT.md
+            dist/*-packages.txt
+            dist/packages/*.deb
+          retention-days: 7
+          compression-level: 0
+
+  boot-test:
+    name: Boot test (${{ matrix.firmware }})
+    needs: build
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || inputs.boot_test }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        firmware: [uefi, bios]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+      - name: Install QEMU and OVMF
+        run: sudo apt-get update -q && sudo apt-get install -y -q qemu-system-x86 ovmf imagemagick xorriso
+      - uses: actions/download-artifact@v4
+        with:
+          name: m-os-iso
+          path: dist
+      - name: Verify checksum
+        run: cd dist && sha256sum -c SHA256SUMS
+      - name: Boot ISO in QEMU/KVM and test the live system
+        run: python3 tests/boot/qemu_boot_test.py --iso dist/M-OS-*-amd64.iso --firmware ${{ matrix.firmware }} --out boot-${{ matrix.firmware }}
+      - name: Report
+        if: always()
+        run: cat boot-${{ matrix.firmware }}/report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: boot-test-${{ matrix.firmware }}
+          path: boot-${{ matrix.firmware }}/
+          retention-days: 30
+
+  publish:
+    name: Publish pre-release
+    needs: [build, boot-test]
+    if: ${{ inputs.publish }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: m-os-iso
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: boot-test-*
+          path: boot
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          V="${{ needs.build.outputs.version }}"
+          TAG="v${V}-preview.${GITHUB_RUN_NUMBER}"
+          cd dist
+          ISO=$(ls M-OS-*-amd64.iso)
+          ASSETS="SHA256SUMS BUILD-REPORT.md"
+          # GitHub release assets must be < 2 GiB; split larger images.
+          if [ "$(stat -c %s "$ISO")" -ge 2000000000 ]; then
+            split -b 1900M -d -a 1 "$ISO" "$ISO.part"
+            sha256sum "$ISO".part* >> SHA256SUMS
+            ASSETS="$ASSETS $(ls "$ISO".part*)"
+            NOTE="The ISO is split into parts. Join with: cat $ISO.part* > $ISO && sha256sum -c SHA256SUMS"
+          else
+            ASSETS="$ASSETS $ISO"
+            NOTE="Verify with: sha256sum -c SHA256SUMS"
+          fi
+          for fw in uefi bios; do
+            [ -f "../boot/boot-test-$fw/report.md" ] && cp "../boot/boot-test-$fw/report.md" "boot-test-$fw.md" && ASSETS="$ASSETS boot-test-$fw.md"
+          done
+          {
+            echo "M OS ${V} developer preview — Debian 13 + KDE Plasma 6."
+            echo
+            echo "**Preview build. Test in a virtual machine first. Back up your data before installing on real hardware.**"
+            echo
+            echo "$NOTE"
+            echo
+            cat BUILD-REPORT.md
+          } > notes.md
+          # shellcheck disable=SC2086
+          gh release create "$TAG" $ASSETS --prerelease --title "M OS ${V} Preview (build ${GITHUB_RUN_NUMBER})" \
+            --notes-file notes.md --target "${GITHUB_SHA}"

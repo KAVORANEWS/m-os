@@ -1,0 +1,34 @@
+#!/bin/sh
+# Brand and harden the Calamares installer configuration for M OS.
+set -e
+CFG=/etc/calamares
+[ -d "$CFG" ] || { echo "calamares not installed" >&2; exit 1; }
+[ -f "$CFG/branding/mos/branding.desc" ] || { echo "M OS installer branding missing" >&2; exit 1; }
+
+# Use M OS branding
+sed -i 's/^branding:.*/branding: mos/' "$CFG/settings.conf"
+
+# Require 8+ character passwords for the created account
+sed -i 's/^\(\s*\)minLength:.*/\1minLength: 8/' "$CFG/modules/users.conf"
+sed -i 's/^\(\s*\)- minlen=0/\1- minlen=8/' "$CFG/modules/users.conf"
+
+# M OS needs less disk than the Debian default estimate
+sed -i 's/requiredStorage:.*/requiredStorage:    20/' "$CFG/modules/welcome.conf"
+
+# Launcher identity
+f=/usr/share/applications/calamares-install-debian.desktop
+if [ -f "$f" ]; then
+    sed -i -e 's/^Name=.*/Name=Install M OS/' -e '/^Name\[/d' \
+           -e 's/^GenericName=.*/GenericName=Install M OS to this computer/' -e '/^GenericName\[/d' \
+           -e 's/^Comment=.*/Comment=Install M OS to this computer/' -e '/^Comment\[/d' \
+           -e 's/^Icon=.*/Icon=mos-logo/' "$f"
+fi
+
+# After installation Calamares' packages module removes the live-only packages
+# (live-boot, live-config, calamares-settings-debian with its desktop shortcut).
+# M OS also removes the installer program itself from the installed system.
+if ! grep -q "^      - 'calamares'$" "$CFG/modules/packages.conf"; then
+    sed -i "s/^\(\s*\)- 'calamares-settings-debian'$/&\n\1- 'calamares'/" "$CFG/modules/packages.conf"
+fi
+grep -q "^      - 'calamares'$" "$CFG/modules/packages.conf" || { echo "packages.conf: calamares removal not applied" >&2; exit 1; }
+grep -n "branding:" "$CFG/settings.conf"

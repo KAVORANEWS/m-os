@@ -1,0 +1,40 @@
+{
+  "iso": "M-OS-0.1.0-amd64.iso",
+  "firmware": "uefi",
+  "kvm": false,
+  "mem_mb": 1100,
+  "cpus": 2,
+  "checks": {
+    "boots to login prompt": {
+      "passed": true,
+      "detail": "194.8 s",
+      "required": true
+    },
+    "live user login over serial console": {
+      "passed": true,
+      "detail": "",
+      "required": true
+    },
+    "os-release identifies M OS": {
+      "passed": false,
+      "detail": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nID=debian",
+      "required": true
+    },
+    "booted via UEFI firmware": {
+      "passed": true,
+      "detail": "uefi",
+      "required": true
+    },
+    "SDDM display manager active": {
+      "passed": true,
+      "detail": "active",
+      "required": true
+    }
+  },
+  "measurements": {
+    "boot_to_login_prompt_s": 194.8,
+    "kernel": "6.12.118+deb13-amd64"
+  },
+  "passed": false,
+  "duration_s": 1411.5
+}

@@ -1,0 +1,20 @@
+Source: mos-desktop-config
+Section: misc
+Priority: optional
+Maintainer: M OS Project <dotsoftwarelk@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Homepage: https://github.com/dotsoftwarelk/m-os
+Rules-Requires-Root: no
+
+Package: mos-desktop-config
+Architecture: all
+Depends: ${misc:Depends}, mos-branding (>= 0.1.0), ufw, apparmor
+Conflicts: desktop-base
+Recommends: plasma-workspace, sddm, fcitx5, fcitx5-m17n, systemd-zram-generator
+Description: M OS desktop and system defaults
+ System-wide defaults for M OS: KDE Plasma configuration (M OS Modern
+ layout, M OS Dark theme, Inter font, Papirus icons), SDDM login screen,
+ screen locking, Sinhala input method profile, zram swap for 4-8 GB
+ computers, kernel/network hardening and a first-boot firewall setup
+ (deny incoming, allow outgoing).

@@ -1,0 +1,14 @@
+PRETTY_NAME="M OS 0.1 Preview"
+NAME="M OS"
+VERSION_ID="0.1"
+VERSION="0.1 Preview (based on Debian 13 trixie)"
+VERSION_CODENAME=trixie
+DEBIAN_VERSION_FULL=13
+ID=mos
+ID_LIKE=debian
+LOGO=mos-logo
+ANSI_COLOR="1;35"
+HOME_URL="https://github.com/dotsoftwarelk/m-os"
+DOCUMENTATION_URL="https://github.com/dotsoftwarelk/m-os/tree/main/docs"
+SUPPORT_URL="https://github.com/dotsoftwarelk/m-os/issues"
+BUG_REPORT_URL="https://github.com/dotsoftwarelk/m-os/issues"

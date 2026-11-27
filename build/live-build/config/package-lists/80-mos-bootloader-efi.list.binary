@@ -1,0 +1,13 @@
+# ISO pool for offline installation (Calamares bootloader-config runs
+# "apt-get install grub-efi" from the live medium on UEFI systems).
+# live-build resolves each .list.binary file as a separate apt transaction,
+# so the conflicting grub-pc / grub-efi-amd64 sets live in separate files.
+grub-efi
+grub-efi-amd64
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+shim-signed
+shim-helpers-amd64-signed
+mokutil
+efibootmgr
+os-prober

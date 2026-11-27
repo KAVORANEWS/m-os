@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>M OS Project</vendor>
+  <vendor_url>https://github.com/dotsoftwarelk/m-os</vendor_url>
+  <icon_name>mos-update-center</icon_name>
+
+  <action id="org.mos.updatecenter.helper">
+    <description>Check for and install M OS software updates</description>
+    <description xml:lang="si">M OS මෘදුකාංග යාවත්කාලීන පරීක්ෂා කර ස්ථාපනය කරන්න</description>
+    <message>Authentication is required to update the system software</message>
+    <message xml:lang="si">පද්ධති මෘදුකාංග යාවත්කාලීන කිරීමට සත්‍යාපනය අවශ්‍යයි</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/mos/mos-update-helper</annotate>
+  </action>
+
+  <action id="org.mos.controlcenter.firewall">
+    <description>Change M OS firewall settings</description>
+    <message>Authentication is required to change the firewall settings</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/mos/mos-firewall-helper</annotate>
+  </action>
+</policyconfig>
