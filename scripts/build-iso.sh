@@ -21,6 +21,7 @@ GIT_COMMIT="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
 
 log() { printf '\n\033[1;35m==> %s\033[0m\n' "$*"; }
 die() { printf '\033[1;31mERROR: %s\033[0m\n' "$*" >&2; exit 1; }
+warn() { printf '\033[1;33mWARNING: %s\033[0m\n' "$*" >&2; }
 
 [ "$(id -u)" -eq 0 ] || die "live-build needs root. Run: sudo $0"
 
@@ -50,12 +51,20 @@ fi
 
 log "4/9 Preparing live-build tree"
 mkdir -p "$WORK" "$DIST"
-if [ -d "$LBDIR" ]; then
-    (cd "$LBDIR" && lb clean --purge >/dev/null 2>&1) || true
+if [ "${MOS_RESUME:-0}" = 1 ] && [ -d "$LBDIR/chroot" ]; then
+    # Developer mode: keep completed live-build stages (chroot, squashfs) and
+    # only refresh the configuration. Never use this for release builds.
+    warn "MOS_RESUME=1: reusing completed stages in $LBDIR"
+    rsync -a --delete --exclude 'cache' "$ROOT/build/live-build/auto/" "$LBDIR/auto/"
+    rsync -a --delete "$ROOT/build/live-build/config/" "$LBDIR/config/"
+else
+    if [ -d "$LBDIR" ]; then
+        (cd "$LBDIR" && lb clean --purge >/dev/null 2>&1) || true
+    fi
+    rm -rf "$LBDIR"
+    mkdir -p "$LBDIR"
+    rsync -a --exclude 'cache' "$ROOT/build/live-build/" "$LBDIR/"
 fi
-rm -rf "$LBDIR"
-mkdir -p "$LBDIR"
-rsync -a --exclude 'cache' "$ROOT/build/live-build/" "$LBDIR/"
 # Persistent package cache between builds
 mkdir -p "$WORK/cache"
 ln -sfn "$WORK/cache" "$LBDIR/cache"

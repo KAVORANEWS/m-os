@@ -1,0 +1,5 @@
+# ISO pool for offline installation on legacy BIOS systems
+# (Calamares bootloader-config runs "apt-get install grub-pc").
+grub-pc
+grub-pc-bin
+os-prober

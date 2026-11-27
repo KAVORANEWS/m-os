@@ -1,0 +1,4 @@
+# ISO pool: tools Calamares installs when the target uses LUKS encryption.
+cryptsetup
+cryptsetup-initramfs
+keyutils
