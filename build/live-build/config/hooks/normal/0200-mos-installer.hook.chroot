@@ -24,6 +24,11 @@ if [ -f "$f" ]; then
            -e 's/^Icon=.*/Icon=mos-logo/' "$f"
 fi
 
-# After installation the live-only welcome shortcut and installer are removed
-# by Calamares' packages module (calamares-settings-debian behaviour).
+# After installation Calamares' packages module removes the live-only packages
+# (live-boot, live-config, calamares-settings-debian with its desktop shortcut).
+# M OS also removes the installer program itself from the installed system.
+if ! grep -q "^      - 'calamares'$" "$CFG/modules/packages.conf"; then
+    sed -i "s/^\(\s*\)- 'calamares-settings-debian'$/&\n\1- 'calamares'/" "$CFG/modules/packages.conf"
+fi
+grep -q "^      - 'calamares'$" "$CFG/modules/packages.conf" || { echo "packages.conf: calamares removal not applied" >&2; exit 1; }
 grep -n "branding:" "$CFG/settings.conf"
