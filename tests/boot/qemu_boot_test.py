@@ -122,7 +122,7 @@ class Serial:
     def run(self, command: str, timeout: float = 60) -> tuple[int | None, str]:
         tag = f"T{int(time.time() * 1000) % 10**8}"
         self.send(f"echo {tag}-BEGIN; {command}; echo {tag}-END $?\n")
-        m = self.expect(rf"{tag}-BEGIN\r?\n(.*?){tag}-END (\d+)", timeout)
+        m = self.expect(rf"(?s){tag}-BEGIN\r?\n(.*?){tag}-END (\d+)", timeout)
         if not m:
             return None, ""
         out = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", m.group(1)).replace("\r", "").strip()
