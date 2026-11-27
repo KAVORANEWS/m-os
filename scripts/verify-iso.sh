@@ -38,8 +38,16 @@ grep -q "Try or Install M OS" "$TMP/grub.cfg" && pass "GRUB menu is M OS branded
 grep -qE "@[A-Z_]+@" "$TMP/grub.cfg" && bad "unsubstituted placeholders in grub.cfg" || pass "GRUB placeholders substituted"
 
 if command -v unsquashfs >/dev/null; then
-    xorriso -osirrox on -indev "$ISO" -extract /live/filesystem.squashfs "$TMP/fs.squashfs" >/dev/null 2>&1
-    unsquashfs -l "$TMP/fs.squashfs" 2>/dev/null | sed 's|^squashfs-root||' > "$TMP/sqlist"
+    # Read the squashfs in place (no multi-GB copy into a possibly small /tmp):
+    # find its start block inside the ISO and pass the byte offset to unsquashfs.
+    lba=$(xorriso -indev "$ISO" -find /live/filesystem.squashfs -exec report_lba -- 2>/dev/null |
+          awk -F',' '/File data lba/ {gsub(/ /, "", $2); print $2; exit}')
+    SQ="$ISO"; SQOPT=(-o "$(( ${lba:-0} * 2048 ))")
+    if [ -z "$lba" ] || ! unsquashfs "${SQOPT[@]}" -s "$SQ" >/dev/null 2>&1; then
+        bad "cannot read /live/filesystem.squashfs inside the ISO"
+        SQOPT=()
+    fi
+    unsquashfs "${SQOPT[@]}" -l "$SQ" 2>/dev/null | sed 's|^squashfs-root||' > "$TMP/sqlist"
     for f in /usr/bin/mos-welcome /usr/bin/mos-control-center /usr/bin/mos-update-center \
              /usr/bin/mos-system-monitor /usr/bin/mos-about /usr/bin/mos-desktopctl \
              /usr/bin/plasmashell /usr/bin/sddm /usr/bin/calamares /usr/sbin/ufw /usr/bin/dolphin \
@@ -47,11 +55,11 @@ if command -v unsquashfs >/dev/null; then
              /etc/calamares/branding/mos/branding.desc /usr/share/plymouth/themes/mos/mos.plymouth; do
         grep -qx "$f" "$TMP/sqlist" && pass "image contains $f" || bad "image missing $f"
     done
-    unsquashfs -d "$TMP/x" "$TMP/fs.squashfs" usr/lib/os-release etc/calamares/settings.conf >/dev/null 2>&1
+    unsquashfs "${SQOPT[@]}" -d "$TMP/x" "$SQ" usr/lib/os-release etc/calamares/settings.conf >/dev/null 2>&1
     grep -q '^NAME="M OS"' "$TMP/x/usr/lib/os-release" 2>/dev/null && pass "os-release identifies M OS" || bad "os-release is not M OS"
     grep -q '^branding: mos' "$TMP/x/etc/calamares/settings.conf" 2>/dev/null && pass "installer uses M OS branding" || bad "installer branding not applied"
     grep -qx "/usr/share/desktop-base" "$TMP/sqlist" && bad "Debian desktop-base still installed" || pass "desktop-base removed"
-    echo "squashfs: $(numfmt --to=iec-i --suffix=B "$(stat -c %s "$TMP/fs.squashfs")"), $(wc -l < "$TMP/sqlist") entries"
+    echo "squashfs: $(wc -l < "$TMP/sqlist") entries"
 fi
 
 [ "$fail" -eq 0 ] && echo "ISO verification PASSED" || echo "ISO verification FAILED"

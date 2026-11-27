@@ -58,6 +58,8 @@ if [ "${MOS_RESUME:-0}" = 1 ] && [ -d "$LBDIR/chroot" ]; then
     warn "MOS_RESUME=1: reusing completed stages in $LBDIR"
     rsync -a --delete --exclude 'cache' "$ROOT/build/live-build/auto/" "$LBDIR/auto/"
     rsync -a --delete "$ROOT/build/live-build/config/" "$LBDIR/config/"
+    # Always regenerate the ISO image itself
+    rm -f "$LBDIR/.build/binary_iso" "$LBDIR/.build/binary_checksums"
 else
     if [ -d "$LBDIR" ]; then
         (cd "$LBDIR" && lb clean --purge >/dev/null 2>&1) || true
@@ -88,7 +90,16 @@ lb build 2>&1 | tee "$WORK/lb-build.log"
 rc=${PIPESTATUS[0]}
 set -e
 [ "$rc" -eq 0 ] || die "lb build failed (exit $rc); see $WORK/lb-build.log"
-grep -q "MOS-VERIFY: all checks passed" "$WORK/lb-build.log" || die "in-image verification hook did not pass"
+# The 9100-mos-verify hook runs inside the chroot stage. Record its success
+# next to the chroot so MOS_RESUME builds (which skip the chroot stage) can
+# rely on the verification of the same chroot.
+if grep -q "MOS-VERIFY: all checks passed" "$WORK/lb-build.log"; then
+    date -u +%FT%TZ > "$LBDIR/.mos-verified"
+elif [ "${MOS_RESUME:-0}" = 1 ] && [ -f "$LBDIR/.mos-verified" ] && grep -q "Skipping chroot_hooks, already done" "$WORK/lb-build.log"; then
+    warn "chroot stage reused; in-image verification passed at $(cat "$LBDIR/.mos-verified")"
+else
+    die "in-image verification hook did not pass"
+fi
 
 ISO_BUILT="$(ls -1 "$LBDIR"/*.iso 2>/dev/null | head -1 || true)"
 [ -n "$ISO_BUILT" ] && [ -s "$ISO_BUILT" ] || die "lb build finished but no ISO was produced"
