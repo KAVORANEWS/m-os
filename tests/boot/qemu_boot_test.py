@@ -266,6 +266,14 @@ def main() -> int:
 
             rc, txt = serial.run("pgrep -u mos -af mos-welcome | head -1", 15)
             check("M OS Welcome autostarted", "mos-welcome" in txt, txt, required=False)
+        if not args.no_desktop:
+            rc, txt = serial.run("pgrep -u mos -x plasma-welcome || echo none", 15)
+            check("only M OS Welcome runs (no duplicate KDE welcome)", txt.strip() == "none", txt, required=False)
+            rc, txt = serial.run("tr '\\0' '\\n' < /proc/$(pgrep -u mos -x plasmashell | head -1)/environ "
+                                 "| grep -E '^(XDG_SESSION_TYPE|GTK_IM_MODULE|QT_IM_MODULE|XMODIFIERS)='", 15)
+            wl = "XDG_SESSION_TYPE=wayland" in txt
+            check("input method environment correct for the session", "XMODIFIERS=@im=fcitx" in txt and
+                  (not wl or ("GTK_IM_MODULE" not in txt and "QT_IM_MODULE" not in txt)), txt, required=False)
         rc, txt = serial.run("ls /usr/bin/mos-welcome /usr/bin/mos-control-center /usr/bin/mos-update-center "
                              "/usr/bin/mos-system-monitor /usr/bin/mos-about", 15)
         check("M OS applications installed", rc == 0, txt)
@@ -282,7 +290,7 @@ def main() -> int:
         check("no network services listening on external interfaces", txt.strip() == "", txt or "none")
         rc, txt = serial.run("systemctl is-enabled ssh 2>/dev/null || echo not-installed", 15)
         check("SSH not enabled", "enabled" != txt.strip(), txt)
-        rc, txt = serial.run("swapon --show=NAME,SIZE --noheadings", 15)
+        rc, txt = serial.run("/usr/sbin/swapon --show=NAME,SIZE --noheadings", 15)
         check("zram swap active", "zram" in txt, txt, required=False)
         rc, txt = serial.run("fc-list :lang=si family | head -3", 15)
         check("Sinhala fonts available", rc == 0 and txt.strip() != "", txt)

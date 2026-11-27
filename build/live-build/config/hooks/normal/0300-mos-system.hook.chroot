@@ -22,6 +22,12 @@ if dpkg -s desktop-base >/dev/null 2>&1; then
     apt-get purge -y desktop-base
 fi
 
+# KDE's own first-run app (plasma-welcome, only Recommended by plasma-desktop)
+# duplicates M OS Welcome and opened on top of it in the live session.
+if dpkg -s plasma-welcome >/dev/null 2>&1; then
+    apt-get purge -y plasma-welcome
+fi
+
 # Icon caches for M OS icons
 gtk-update-icon-cache -q -f -t /usr/share/icons/hicolor 2>/dev/null || true
 
