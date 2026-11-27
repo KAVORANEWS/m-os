@@ -55,8 +55,9 @@ if command -v unsquashfs >/dev/null; then
              /etc/calamares/branding/mos/branding.desc /usr/share/plymouth/themes/mos/mos.plymouth; do
         grep -qx "$f" "$TMP/sqlist" && pass "image contains $f" || bad "image missing $f"
     done
-    unsquashfs "${SQOPT[@]}" -d "$TMP/x" "$SQ" usr/lib/os-release etc/calamares/settings.conf >/dev/null 2>&1
+    unsquashfs "${SQOPT[@]}" -d "$TMP/x" "$SQ" usr/lib/os-release etc/os-release etc/calamares/settings.conf >/dev/null 2>&1
     grep -q '^NAME="M OS"' "$TMP/x/usr/lib/os-release" 2>/dev/null && pass "os-release identifies M OS" || bad "os-release is not M OS"
+    grep -q '^NAME="M OS"' "$TMP/x/etc/os-release" 2>/dev/null && pass "/etc/os-release identifies M OS" || bad "/etc/os-release is not M OS"
     grep -q '^branding: mos' "$TMP/x/etc/calamares/settings.conf" 2>/dev/null && pass "installer uses M OS branding" || bad "installer branding not applied"
     grep -qx "/usr/share/desktop-base" "$TMP/sqlist" && bad "Debian desktop-base still installed" || pass "desktop-base removed"
     echo "squashfs: $(wc -l < "$TMP/sqlist") entries"

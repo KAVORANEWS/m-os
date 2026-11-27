@@ -16,6 +16,7 @@ for f in /usr/bin/mos-welcome /usr/bin/mos-control-center /usr/bin/mos-update-ce
     [ -e "$f" ] || { echo "MOS-VERIFY: missing file $f" >&2; fail=1; }
 done
 grep -q '^NAME="M OS"' /usr/lib/os-release || { echo "MOS-VERIFY: os-release not M OS" >&2; fail=1; }
+grep -q '^NAME="M OS"' /etc/os-release || { echo "MOS-VERIFY: /etc/os-release not M OS" >&2; fail=1; }
 python3 -c "import mos.sysinfo, mos.desktopctl, mos.aptparse" || fail=1
 [ "$fail" -eq 0 ] && echo "MOS-VERIFY: all checks passed"
 exit "$fail"

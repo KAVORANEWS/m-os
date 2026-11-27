@@ -189,13 +189,29 @@ def main() -> int:
                 qmp.screenshot(out / "01-grub-menu.png")
                 shot_taken = True
         qmp.key("e")
-        time.sleep(1.5)
+        time.sleep(2)
+        # Entry layout: "setparams ...", blank line, "linux ..." -> move to the
+        # linux line (a single logical line even when wrapped) and append.
+        qmp.key("down")
+        time.sleep(0.5)
+        qmp.key("down")
+        time.sleep(0.5)
         qmp.key("end")
+        time.sleep(0.5)
         qmp.type_text(" console=tty0 console=ttyS0,115200")
+        time.sleep(3)  # let GRUB process the queued keystrokes
         qmp.screenshot(out / "02-grub-edit.png")
         qmp.key("ctrl", "x")
 
-        m = serial.expect(r"login:", boot_timeout)
+        # Wait for the login prompt, saving a progress screenshot every 5 min
+        m = None
+        deadline = t0 + grub_wait + boot_timeout
+        n = 0
+        while m is None and time.time() < deadline:
+            m = serial.expect(r"login:", min(300, max(1, deadline - time.time())))
+            if m is None:
+                n += 1
+                qmp.screenshot(out / f"03-boot-progress-{n:02d}.png")
         report["measurements"]["boot_to_login_prompt_s"] = round(time.time() - t0, 1)
         check("boots to login prompt", m is not None, f"{report['measurements']['boot_to_login_prompt_s']} s")
         if not m:

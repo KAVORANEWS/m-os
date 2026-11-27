@@ -28,3 +28,11 @@ gtk-update-icon-cache -q -f -t /usr/share/icons/hicolor 2>/dev/null || true
 # Default XDG user folders for new accounts
 mkdir -p /etc/skel/Desktop /etc/skel/Documents /etc/skel/Downloads /etc/skel/Pictures \
          /etc/skel/Music /etc/skel/Videos
+
+# live-build's bootstrap stage copies Debian's os-release into /etc/os-release
+# as a regular file (before mos-branding is installed). Restore the standard
+# Debian layout: /etc/os-release -> ../usr/lib/os-release (owned by M OS).
+if [ ! -L /etc/os-release ] || [ "$(readlink /etc/os-release)" != ../usr/lib/os-release ]; then
+    rm -f /etc/os-release
+    ln -s ../usr/lib/os-release /etc/os-release
+fi
