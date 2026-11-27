@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=M OS Welcome
+GenericName=Welcome
+Comment=Set up your M OS desktop
+Exec=mos-welcome
+Icon=mos-welcome
+Terminal=false
+Categories=Qt;KDE;System;
+Keywords=welcome;setup;start;layout;theme;
+StartupNotify=true

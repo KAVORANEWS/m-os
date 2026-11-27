@@ -1,0 +1,13 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [ { "Name": "M OS Project", "Email": "dotsoftwarelk@users.noreply.github.com" } ],
+        "Category": "",
+        "Description": "M OS Modern: top bar, centered floating dock and the M OS Dark theme",
+        "Id": "org.mos.modern.desktop",
+        "License": "LGPL-2.0-or-later",
+        "Name": "M OS Modern",
+        "Website": "https://github.com/dotsoftwarelk/m-os"
+    },
+    "X-Plasma-MainScript": "defaults"
+}

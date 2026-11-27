@@ -1,0 +1,23 @@
+Source: mos-apps
+Section: admin
+Priority: optional
+Maintainer: M OS Project <dotsoftwarelk@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), dh-python, python3
+Standards-Version: 4.7.0
+Homepage: https://github.com/dotsoftwarelk/m-os
+Rules-Requires-Root: no
+
+Package: mos-apps
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, python3-pyqt6, pkexec, apt, pciutils,
+ dbus-bin, mos-branding (>= 0.1.0)
+Recommends: libkf6config-bin, plasma-workspace, systemsettings, power-profiles-daemon,
+ network-manager, ufw, filelight, partitionmanager
+Description: M OS system applications
+ The original M OS applications:
+  * M OS Welcome — first-login setup (layout, theme, performance, privacy)
+  * M OS Control Center — all system settings in one place
+  * M OS Update Center — check for and install Debian updates
+  * M OS System Monitor — CPU, memory, disks, network, processes, sensors
+  * M OS About — version and hardware summary
+  * mos-desktopctl — command-line desktop configuration tool

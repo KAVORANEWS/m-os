@@ -1,0 +1,6 @@
+// M OS: download security updates in the background; installation stays
+// under user control in the M OS Update Center unless the user opts in.
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::Unattended-Upgrade "0";
+APT::Periodic::AutocleanInterval "7";

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=M OS
+Description=M OS boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/mos
+ScriptFile=/usr/share/plymouth/themes/mos/mos.script

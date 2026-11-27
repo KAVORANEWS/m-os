@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_install:
+	mkdir -p debian/mos-desktop-config
+	cp -a files/. debian/mos-desktop-config/
+
+override_dh_installsystemd:
+	dh_installsystemd --name=mos-firewall-setup

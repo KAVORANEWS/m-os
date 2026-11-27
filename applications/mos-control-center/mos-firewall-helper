@@ -1,0 +1,16 @@
+#!/bin/sh
+# M OS Control Center firewall helper (run via pkexec, polkit action
+# org.mos.controlcenter.firewall). Fixed verbs only.
+# SPDX-License-Identifier: GPL-3.0-or-later
+set -eu
+[ "$(id -u)" -eq 0 ] || { echo "must run as root (via pkexec)" >&2; exit 64; }
+command -v ufw >/dev/null 2>&1 || { echo "ufw is not installed" >&2; exit 69; }
+
+case "${1:-}" in
+    status)  exec ufw status verbose ;;
+    enable)  ufw --force default deny incoming
+             ufw --force default allow outgoing
+             exec ufw --force enable ;;
+    disable) exec ufw disable ;;
+    *)       echo "usage: mos-firewall-helper status|enable|disable" >&2; exit 64 ;;
+esac

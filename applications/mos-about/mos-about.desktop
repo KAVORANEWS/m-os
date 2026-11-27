@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=About M OS
+GenericName=About This Computer
+Comment=Version and hardware information
+Exec=mos-about
+Icon=mos-about
+Terminal=false
+Categories=Qt;KDE;System;
+Keywords=about;version;hardware;info;
+StartupNotify=true

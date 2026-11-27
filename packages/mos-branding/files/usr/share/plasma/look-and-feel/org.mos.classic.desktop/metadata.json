@@ -1,0 +1,13 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [ { "Name": "M OS Project", "Email": "dotsoftwarelk@users.noreply.github.com" } ],
+        "Category": "",
+        "Description": "M OS Classic: bottom taskbar with application launcher, system tray and clock",
+        "Id": "org.mos.classic.desktop",
+        "License": "LGPL-2.0-or-later",
+        "Name": "M OS Classic",
+        "Website": "https://github.com/dotsoftwarelk/m-os"
+    },
+    "X-Plasma-MainScript": "defaults"
+}

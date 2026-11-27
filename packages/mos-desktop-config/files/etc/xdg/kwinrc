@@ -1,0 +1,25 @@
+# M OS window manager defaults
+[org.kde.kdecoration2]
+library=org.kde.breeze
+theme=Breeze
+ButtonsOnLeft=XIA
+ButtonsOnRight=
+
+[Desktops]
+Number=4
+Rows=1
+
+[Windows]
+BorderlessMaximizedWindows=false
+ElectricBorderMaximize=true
+ElectricBorderTiling=true
+
+[Effect-overview]
+BorderActivate=9
+
+[Plugins]
+blurEnabled=true
+contrastEnabled=true
+
+[Wayland]
+InputMethod[$e]=/usr/share/applications/org.fcitx.Fcitx5.desktop

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=M OS Welcome
+Comment=First-login setup for M OS
+Exec=mos-welcome --autostart
+Icon=mos-welcome
+Terminal=false
+NoDisplay=true
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=2

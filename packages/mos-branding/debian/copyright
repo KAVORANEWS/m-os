@@ -1,0 +1,16 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: mos-branding
+Source: https://github.com/dotsoftwarelk/m-os
+
+Files: *
+Copyright: 2026 M OS Project
+License: CC-BY-SA-4.0
+ Original artwork is licensed under the Creative Commons
+ Attribution-ShareAlike 4.0 International license.
+ https://creativecommons.org/licenses/by-sa/4.0/
+
+Files: files/usr/share/color-schemes/* files/usr/share/plasma/*
+Copyright: 2026 M OS Project
+License: LGPL-2.0-or-later
+ On Debian systems the full license text is in
+ /usr/share/common-licenses/LGPL-2.

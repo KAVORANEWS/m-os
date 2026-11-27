@@ -1,0 +1,30 @@
+#!/bin/sh
+# System-level M OS defaults that must be applied inside the image.
+set -e
+
+# Never ship remote access services enabled.
+for svc in ssh.service sshd.service; do
+    systemctl disable "$svc" 2>/dev/null || true
+done
+
+# Firewall first-boot unit and AppArmor
+systemctl enable mos-firewall-setup.service
+systemctl enable apparmor.service 2>/dev/null || true
+
+# M OS boot splash
+if command -v plymouth-set-default-theme >/dev/null; then
+    plymouth-set-default-theme mos
+    update-initramfs -u -k all
+fi
+
+# Make sure desktop-base (Debian branding) is not present.
+if dpkg -s desktop-base >/dev/null 2>&1; then
+    apt-get purge -y desktop-base
+fi
+
+# Icon caches for M OS icons
+gtk-update-icon-cache -q -f -t /usr/share/icons/hicolor 2>/dev/null || true
+
+# Default XDG user folders for new accounts
+mkdir -p /etc/skel/Desktop /etc/skel/Documents /etc/skel/Downloads /etc/skel/Pictures \
+         /etc/skel/Music /etc/skel/Videos

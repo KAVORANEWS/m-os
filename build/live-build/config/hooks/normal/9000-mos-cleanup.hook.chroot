@@ -1,0 +1,8 @@
+#!/bin/sh
+# Reduce image size and remove build-time leftovers.
+set -e
+apt-get clean
+rm -rf /var/lib/apt/lists/*_Packages.lz4 /tmp/* /var/tmp/* 2>/dev/null || true
+rm -f /var/lib/dbus/machine-id
+: > /etc/machine-id
+find /var/log -type f -exec truncate -s 0 {} + 2>/dev/null || true

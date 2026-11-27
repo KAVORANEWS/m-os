@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=M OS System Monitor
+GenericName=System Monitor
+Comment=Watch CPU, memory, disks, network and processes
+Exec=mos-system-monitor
+Icon=mos-system-monitor
+Terminal=false
+Categories=Qt;KDE;System;Monitor;
+Keywords=cpu;memory;process;task;monitor;
+StartupNotify=true

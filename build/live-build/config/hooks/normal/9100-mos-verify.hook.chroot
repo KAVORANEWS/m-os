@@ -1,0 +1,21 @@
+#!/bin/sh
+# Fail the build early if core M OS components are missing from the image.
+set -e
+fail=0
+for pkg in mos-branding mos-desktop-config mos-apps plasma-workspace sddm calamares \
+           calamares-settings-debian ufw apparmor linux-image-amd64 live-boot firefox-esr dolphin konsole; do
+    if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "install ok installed"; then
+        echo "MOS-VERIFY: missing package $pkg" >&2
+        fail=1
+    fi
+done
+for f in /usr/bin/mos-welcome /usr/bin/mos-control-center /usr/bin/mos-update-center \
+         /usr/bin/mos-system-monitor /usr/bin/mos-about /usr/share/wallpapers/MOS/metadata.json \
+         /usr/share/plasma/look-and-feel/org.mos.modern.desktop/metadata.json \
+         /etc/calamares/branding/mos/branding.desc; do
+    [ -e "$f" ] || { echo "MOS-VERIFY: missing file $f" >&2; fail=1; }
+done
+grep -q '^NAME="M OS"' /usr/lib/os-release || { echo "MOS-VERIFY: os-release not M OS" >&2; fail=1; }
+python3 -c "import mos.sysinfo, mos.desktopctl, mos.aptparse" || fail=1
+[ "$fail" -eq 0 ] && echo "MOS-VERIFY: all checks passed"
+exit "$fail"
