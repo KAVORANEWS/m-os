@@ -17,7 +17,7 @@ for f in /usr/bin/mos-welcome /usr/bin/mos-control-center /usr/bin/mos-update-ce
 done
 grep -q '^NAME="M OS"' /usr/lib/os-release || { echo "MOS-VERIFY: os-release not M OS" >&2; fail=1; }
 ! dpkg -s plasma-welcome >/dev/null 2>&1 || { echo "MOS-VERIFY: plasma-welcome still installed" >&2; fail=1; }
-[ -r /etc/xdg/plasma-workspace/env/90-mos-input.sh ] || { echo "MOS-VERIFY: input method env script missing" >&2; fail=1; }
+[ -r /etc/profile.d/00-mos-input.sh ] || { echo "MOS-VERIFY: input method env script missing" >&2; fail=1; }
 grep -q '^NAME="M OS"' /etc/os-release || { echo "MOS-VERIFY: /etc/os-release not M OS" >&2; fail=1; }
 python3 -c "import mos.sysinfo, mos.desktopctl, mos.aptparse" || fail=1
 [ "$fail" -eq 0 ] && echo "MOS-VERIFY: all checks passed"

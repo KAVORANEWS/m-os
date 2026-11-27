@@ -8,8 +8,9 @@ tested by M OS**.
 
 | Configuration | Firmware | Result | Date / source |
 |---|---|---|---|
-| QEMU/KVM q35, virtio-vga, 4 GB RAM, 2 vCPU | OVMF UEFI | see `tests/reports/` | CI boot test |
-| QEMU/KVM i440fx, virtio-vga, 4 GB RAM, 2 vCPU | SeaBIOS | see `tests/reports/` | CI boot test |
+| QEMU/KVM q35, virtio-vga, 4 GB RAM, 2 vCPU (AMD EPYC host) | OVMF UEFI | **PASS**: Plasma Wayland desktop in 54 s, 0 failed units | 2026-11-27, CI run 45946526758 |
+| QEMU/KVM, virtio-vga, 4 GB RAM, 2 vCPU | SeaBIOS | **PASS**: Plasma Wayland desktop in 50 s, 0 failed units | 2026-11-27, CI run 45946526758 |
+| QEMU TCG (no KVM), 1.1–1.4 GB RAM | OVMF UEFI | boots to login + SDDM in ~195 s; desktop not reached (host out of memory) | 2026-11-27, local sandbox |
 
 ## Primary target — not yet tested
 

@@ -18,10 +18,11 @@
 > installer path. **Not production-ready.** Try it in a virtual machine first.
 > Back up your data before installing on real hardware. See [Test status](#test-status).
 
-<p align="center"><img src="branding/rendered/previews/modern-fullscreenpreview.jpg" width="720" alt="M OS Modern layout preview (illustration)"></p>
+<p align="center"><img src="tests/reports/2026-11-27-ci-6de819b/uefi-desktop.jpg" width="720" alt="M OS live desktop booted in QEMU/KVM (UEFI)"></p>
 
-*The image above shows the layout concept. Real screenshots from automated VM
-boot tests are attached to each CI run and release.*
+*A real screenshot from the automated UEFI boot test (CI, QEMU/KVM). It shows
+the M OS Modern layout with M OS Welcome. The KDE Welcome window and the
+Fcitx notice in this capture were bugs found by this test and fixed since.*
 
 ## What M OS is
 
@@ -105,7 +106,7 @@ results are in [`tests/reports/`](tests/reports/) and on each CI run.
 | Debian packages build + lintian + content tests | ✅ | ✅ |
 | M OS apps open and render against real `/proc`/`/sys` (offscreen Qt) | ✅ | ✅ GUI smoke test |
 | ISO build + structure verification | ✅ | ✅ `verify-iso.sh` |
-| Live boot via UEFI and BIOS to Plasma desktop, in-system checks | ✅ | see `tests/reports/` |
+| Live boot via UEFI and BIOS to Plasma desktop + 20 in-system checks (QEMU/KVM) | ✅ | ✅ PASS both: desktop in ~50–54 s ([report](tests/reports/README.md)) |
 | Graphical installation onto a virtual disk | ✅ (Calamares) | ⏳ manual procedure, not yet automated |
 | Real hardware (i5-6500 / HD 530) | — | ❌ not tested yet |
 | Secure Boot with enrolled keys | configured | ❌ not verified |
